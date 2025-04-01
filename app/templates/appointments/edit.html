@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Agendamento - Timesaver{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Editar Agendamento</h1>
+        <a href="{{ url_for('appointments.index') }}" class="text-primary hover:text-secondary">
+            <i class="fas fa-arrow-left mr-1"></i> Voltar para Lista
+        </a>
+    </div>
+
+    <form method="post" action="{{ url_for('appointments.update', id=appointment.id) }}" class="space-y-6">
+        <!-- Informações básicas -->
+        <div class="bg-gray-50 p-4 rounded-md mb-6">
+            <h3 class="text-lg font-medium text-gray-800 mb-4">Informações Básicas</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Data *</label>
+                    <input type="date" id="date" name="date" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="{{ appointment.date|date_format }}" required>
+                </div>
+                
+                <div>
+                    <label for="time" class="block text-sm font-medium text-gray-700 mb-1">Hora *</label>
+                    <input type="time" id="time" name="time" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="{{ appointment.time|time_format }}" required>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Informações do Cliente -->
+        <div class="bg-gray-50 p-4 rounded-md mb-6">
+            <h3 class="text-lg font-medium text-gray-800 mb-4">Informações do Paciente</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="client_name" class="block text-sm font-medium text-gray-700 mb-1">Nome do Paciente *</label>
+                    <input type="text" id="client_name" name="client_name" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="{{ appointment.client_name }}" required>
+                </div>
+                
+                {% if 'client_phone' in columns %}
+                <div>
+                    <label for="client_phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                    <input type="tel" id="client_phone" name="client_phone" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="{{ appointment.client_phone or '' }}">
+                </div>
+                {% endif %}
+                
+                {% if 'client_email' in columns %}
+                <div>
+                    <label for="client_email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="client_email" name="client_email" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="{{ appointment.client_email or '' }}">
+                </div>
+                {% endif %}
+                
+                {% if 'insurance' in columns %}
+                <div>
+                    <label for="insurance" class="block text-sm font-medium text-gray-700 mb-1">Convênio</label>
+                    <select id="insurance" name="insurance" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                        <option value="" {% if not appointment.insurance %}selected{% endif %}>Particular</option>
+                        <option value="Unimed" {% if appointment.insurance == 'Unimed' %}selected{% endif %}>Unimed</option>
+                        <option value="Amil" {% if appointment.insurance == 'Amil' %}selected{% endif %}>Amil</option>
+                        <option value="SulAmérica" {% if appointment.insurance == 'SulAmérica' %}selected{% endif %}>SulAmérica</option>
+                        <option value="Bradesco Saúde" {% if appointment.insurance == 'Bradesco Saúde' %}selected{% endif %}>Bradesco Saúde</option>
+                        <option value="Notre Dame" {% if appointment.insurance == 'Notre Dame' %}selected{% endif %}>Notre Dame</option>
+                    </select>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Informações do Serviço -->
+        <div class="bg-gray-50 p-4 rounded-md mb-6">
+            <h3 class="text-lg font-medium text-gray-800 mb-4">Informações do Serviço</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="service" class="block text-sm font-medium text-gray-700 mb-1">Procedimento/Serviço *</label>
+                    <input type="text" id="service" name="service" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="{{ appointment.service }}" required>
+                </div>
+                
+                {% if 'tuss_code' in columns %}
+                <div>
+                    <label for="tuss_code" class="block text-sm font-medium text-gray-700 mb-1">Código TUSS</label>
+                    <input type="text" id="tuss_code" name="tuss_code" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="{{ appointment.tuss_code or '' }}">
+                </div>
+                {% endif %}
+                
+                {% if 'doctor' in columns %}
+                <div>
+                    <label for="doctor" class="block text-sm font-medium text-gray-700 mb-1">Médico Responsável</label>
+                    <input type="text" id="doctor" name="doctor" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="{{ appointment.doctor or '' }}">
+                </div>
+                {% endif %}
+                
+                {% if 'status' in columns %}
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select id="status" name="status" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                        <option value="agendado" {% if appointment.status == 'agendado' %}selected{% endif %}>Agendado</option>
+                        <option value="confirmado" {% if appointment.status == 'confirmado' %}selected{% endif %}>Confirmado</option>
+                        <option value="realizado" {% if appointment.status == 'realizado' %}selected{% endif %}>Realizado</option>
+                        <option value="cancelado" {% if appointment.status == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                    </select>
+                </div>
+                {% endif %}
+                
+                {% if 'notes' in columns %}
+                <div class="md:col-span-2">
+                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                    <textarea id="notes" name="notes" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">{{ appointment.notes or '' }}</textarea>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+            <a href="{{ url_for('appointments.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Cancelar
+            </a>
+            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Atualizar Agendamento
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %} 

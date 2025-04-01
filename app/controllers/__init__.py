@@ -1,0 +1,1 @@
+from app.controllers.appointment_controller import appointment_bp 

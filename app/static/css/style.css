@@ -1,0 +1,109 @@
+/* Estilos gerais */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+/* Estilos de tabela */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Estilos de formulário */
+.form-label {
+    font-weight: 500;
+}
+
+/* Estilos de card */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+}
+
+/* Estilos de botões */
+.btn-group .btn {
+    margin-right: 0.25rem;
+}
+
+/* Estilos de alerta */
+.alert {
+    margin-bottom: 1.5rem;
+}
+
+/* Personalização para campos de formulário */
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Estilos para tabelas */
+.overflow-x-auto {
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Animações */
+.transition-colors {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Ícones nos botões */
+button i, a i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ajustes para mobile */
+@media (max-width: 640px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .overflow-x-auto {
+        margin-left: -1rem;
+        margin-right: -1rem;
+        width: calc(100% + 2rem);
+        border-radius: 0;
+    }
+}
+
+/* Personalização para placeholder de inputs */
+::placeholder {
+    color: #a0aec0;
+    opacity: 1;
+}
+
+/* Animação suave de hover para elementos clicáveis */
+a, button {
+    transition: all 0.2s ease;
+}
+
+/* Remover seleção do texto em botões */
+button {
+    user-select: none;
+} 
