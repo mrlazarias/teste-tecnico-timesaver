@@ -1,86 +1,148 @@
 {% extends 'base.html' %}
 
-{% block title %}Agendamentos - Timesaver{% endblock %}
+{% block title %}Agendamentos - TimeSaver{% endblock %}
 
 {% block content %}
-<div class="bg-white rounded-lg shadow-md p-6 mb-6">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Gerenciar Agendamentos</h1>
-        <a href="{{ url_for('appointments.new') }}" class="inline-flex items-center px-4 py-2 bg-primary hover:bg-secondary text-white rounded-md shadow transition duration-150 ease-in-out">
-            <i class="fas fa-plus mr-2"></i> Novo Agendamento
-        </a>
+<div class="max-w-7xl mx-auto">
+    <!-- Header Section -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">Agendamentos</h1>
+                <p class="text-gray-600">Gerencie todos os agendamentos da sua clínica em um só lugar</p>
+            </div>
+            <a href="{{ url_for('appointments.new') }}" 
+                class="inline-flex items-center px-6 py-3 bg-primary hover:bg-secondary text-white rounded-lg shadow-md transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i class="fas fa-plus-circle mr-2"></i>
+                Novo Agendamento
+            </a>
+        </div>
     </div>
 
     <!-- Filtros -->
-    <div class="bg-gray-50 p-4 rounded-md mb-6">
-        <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-medium text-gray-800">Filtros</h3>
-            <button id="toggle-filters" class="text-gray-500 hover:text-gray-700">
-                <i class="fas fa-filter"></i> <span class="text-sm">Mostrar/Ocultar Filtros</span>
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                <i class="fas fa-filter text-primary mr-2"></i>
+                Filtros de Busca
+            </h2>
+            <button id="toggle-filters" class="text-gray-500 hover:text-primary transition-colors">
+                <i class="fas fa-chevron-down" id="filter-icon"></i>
             </button>
         </div>
         
         <div id="filters-container" class="hidden">
-            <form method="get" action="{{ url_for('appointments.index') }}" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <form method="get" action="{{ url_for('appointments.index') }}" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Data -->
                     <div>
                         <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Data</label>
-                        <input type="date" id="date" name="date" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="{{ request.args.get('date', '') }}">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="far fa-calendar text-gray-400"></i>
+                            </div>
+                            <input type="date" id="date" name="date" 
+                                class="pl-10 w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                                value="{{ request.args.get('date', '') }}">
+                        </div>
                     </div>
-                    
+
+                    <!-- Paciente -->
                     <div>
                         <label for="client" class="block text-sm font-medium text-gray-700 mb-1">Paciente</label>
-                        <input type="text" id="client" name="client" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="{{ request.args.get('client', '') }}">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="far fa-user text-gray-400"></i>
+                            </div>
+                            <input type="text" id="client" name="client" 
+                                class="pl-10 w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                                placeholder="Nome do paciente"
+                                value="{{ request.args.get('client', '') }}">
+                        </div>
                     </div>
-                    
+
+                    <!-- Serviço -->
                     <div>
                         <label for="service" class="block text-sm font-medium text-gray-700 mb-1">Serviço</label>
-                        <input type="text" id="service" name="service" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="{{ request.args.get('service', '') }}">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-briefcase-medical text-gray-400"></i>
+                            </div>
+                            <input type="text" id="service" name="service" 
+                                class="pl-10 w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                                placeholder="Nome do serviço"
+                                value="{{ request.args.get('service', '') }}">
+                        </div>
                     </div>
-                    
+
                     {% if 'insurance' in columns %}
+                    <!-- Convênio -->
                     <div>
                         <label for="insurance" class="block text-sm font-medium text-gray-700 mb-1">Convênio</label>
-                        <select id="insurance" name="insurance" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
-                            <option value="">Todos</option>
-                            {% for ins in insurances %}
-                            <option value="{{ ins }}" {% if request.args.get('insurance') == ins %}selected{% endif %}>{{ ins }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-id-card text-gray-400"></i>
+                            </div>
+                            <select id="insurance" name="insurance" 
+                                class="pl-10 w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                                <option value="">Todos os convênios</option>
+                                {% for ins in insurances %}
+                                <option value="{{ ins }}" {% if request.args.get('insurance') == ins %}selected{% endif %}>{{ ins }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                     {% endif %}
-                    
+
                     {% if 'doctor' in columns %}
+                    <!-- Médico -->
                     <div>
                         <label for="doctor" class="block text-sm font-medium text-gray-700 mb-1">Médico</label>
-                        <select id="doctor" name="doctor" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
-                            <option value="">Todos</option>
-                            {% for doc in doctors %}
-                            <option value="{{ doc }}" {% if request.args.get('doctor') == doc %}selected{% endif %}>{{ doc }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user-md text-gray-400"></i>
+                            </div>
+                            <select id="doctor" name="doctor" 
+                                class="pl-10 w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                                <option value="">Todos os médicos</option>
+                                {% for doc in doctors %}
+                                <option value="{{ doc }}" {% if request.args.get('doctor') == doc %}selected{% endif %}>{{ doc }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                     {% endif %}
-                    
+
                     {% if 'status' in columns %}
+                    <!-- Status -->
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select id="status" name="status" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
-                            <option value="">Todos</option>
-                            <option value="agendado" {% if request.args.get('status') == 'agendado' %}selected{% endif %}>Agendado</option>
-                            <option value="confirmado" {% if request.args.get('status') == 'confirmado' %}selected{% endif %}>Confirmado</option>
-                            <option value="realizado" {% if request.args.get('status') == 'realizado' %}selected{% endif %}>Realizado</option>
-                            <option value="cancelado" {% if request.args.get('status') == 'cancelado' %}selected{% endif %}>Cancelado</option>
-                        </select>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-tasks text-gray-400"></i>
+                            </div>
+                            <select id="status" name="status" 
+                                class="pl-10 w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                                <option value="">Todos os status</option>
+                                <option value="agendado" {% if request.args.get('status') == 'agendado' %}selected{% endif %}>Agendado</option>
+                                <option value="confirmado" {% if request.args.get('status') == 'confirmado' %}selected{% endif %}>Confirmado</option>
+                                <option value="realizado" {% if request.args.get('status') == 'realizado' %}selected{% endif %}>Realizado</option>
+                                <option value="cancelado" {% if request.args.get('status') == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                            </select>
+                        </div>
                     </div>
                     {% endif %}
                 </div>
-                
-                <div class="flex justify-end space-x-3">
-                    <a href="{{ url_for('appointments.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+
+                <div class="flex justify-end space-x-4">
+                    <a href="{{ url_for('appointments.index') }}" 
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+                        <i class="fas fa-eraser mr-2"></i>
                         Limpar Filtros
                     </a>
-                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <button type="submit" 
+                        class="inline-flex items-center px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+                        <i class="fas fa-search mr-2"></i>
                         Filtrar
                     </button>
                 </div>
@@ -88,123 +150,154 @@
         </div>
     </div>
 
-    <!-- Tabela de Agendamentos -->
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Data/Hora
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Paciente
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Serviço
-                    </th>
-                    {% if 'doctor' in columns %}
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Médico
-                    </th>
-                    {% endif %}
-                    {% if 'status' in columns %}
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                    </th>
-                    {% endif %}
-                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Ações
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                {% for appointment in appointments %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ appointment.date.strftime('%d/%m/%Y') }}</div>
-                        <div class="text-sm text-gray-500">{{ appointment.time.strftime('%H:%M') }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">{{ appointment.client_name }}</div>
-                        {% if 'client_phone' in columns and appointment.client_phone %}
-                        <div class="text-sm text-gray-500">{{ appointment.client_phone }}</div>
+    <!-- Lista de Agendamentos -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        {% if appointments %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Data/Hora
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Paciente
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Serviço
+                        </th>
+                        {% if 'doctor' in columns %}
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Médico
+                        </th>
                         {% endif %}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ appointment.service }}</div>
-                        {% if 'insurance' in columns and appointment.insurance %}
-                        <div class="text-sm text-gray-500">{{ appointment.insurance }}</div>
+                        {% if 'status' in columns %}
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
                         {% endif %}
-                    </td>
-                    {% if 'doctor' in columns %}
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ appointment.doctor or '-' }}</div>
-                    </td>
-                    {% endif %}
-                    {% if 'status' in columns %}
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        {% if appointment.status == 'agendado' %}
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                            Agendado
-                        </span>
-                        {% elif appointment.status == 'confirmado' %}
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            Confirmado
-                        </span>
-                        {% elif appointment.status == 'realizado' %}
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
-                            Realizado
-                        </span>
-                        {% elif appointment.status == 'cancelado' %}
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                            Cancelado
-                        </span>
-                        {% else %}
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                            -
-                        </span>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Ações
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for appointment in appointments %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full {{ 'bg-blue-100' if appointment.status == 'agendado' else 'bg-green-100' if appointment.status == 'confirmado' else 'bg-purple-100' if appointment.status == 'realizado' else 'bg-red-100' }}">
+                                    <i class="fas fa-calendar-day {{ 'text-blue-500' if appointment.status == 'agendado' else 'text-green-500' if appointment.status == 'confirmado' else 'text-purple-500' if appointment.status == 'realizado' else 'text-red-500' }}"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ appointment.date.strftime('%d/%m/%Y') }}</div>
+                                    <div class="text-sm text-gray-500">{{ appointment.time.strftime('%H:%M') }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ appointment.client_name }}</div>
+                            {% if 'client_phone' in columns and appointment.client_phone %}
+                            <div class="text-sm text-gray-500">{{ appointment.client_phone }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ appointment.service }}</div>
+                            {% if 'insurance' in columns and appointment.insurance %}
+                            <div class="text-sm text-gray-500">{{ appointment.insurance }}</div>
+                            {% endif %}
+                        </td>
+                        {% if 'doctor' in columns %}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ appointment.doctor or '-' }}</div>
+                        </td>
                         {% endif %}
-                    </td>
+                        {% if 'status' in columns %}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if appointment.status == 'agendado' %}bg-blue-100 text-blue-800
+                                {% elif appointment.status == 'confirmado' %}bg-green-100 text-green-800
+                                {% elif appointment.status == 'realizado' %}bg-purple-100 text-purple-800
+                                {% elif appointment.status == 'cancelado' %}bg-red-100 text-red-800
+                                {% endif %}">
+                                <i class="fas {% if appointment.status == 'agendado' %}fa-clock
+                                    {% elif appointment.status == 'confirmado' %}fa-check
+                                    {% elif appointment.status == 'realizado' %}fa-check-double
+                                    {% elif appointment.status == 'cancelado' %}fa-times
+                                    {% endif %} mr-1"></i>
+                                {{ appointment.status|title }}
+                            </span>
+                        </td>
+                        {% endif %}
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex justify-end space-x-3">
+                                <a href="{{ url_for('appointments.edit', id=appointment.id) }}" 
+                                    class="text-indigo-600 hover:text-indigo-900 transition-colors" 
+                                    title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="post" action="{{ url_for('appointments.delete', id=appointment.id) }}" 
+                                    class="inline" 
+                                    onsubmit="return confirm('Tem certeza que deseja excluir este agendamento?');">
+                                    <button type="submit" 
+                                        class="text-red-600 hover:text-red-900 transition-colors" 
+                                        title="Excluir">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <div class="flex flex-col items-center">
+                <div class="rounded-full bg-gray-100 p-6 mb-4">
+                    <i class="fas fa-calendar-times text-4xl text-gray-400"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum agendamento encontrado</h3>
+                <p class="text-gray-500 mb-6">
+                    {% if request.args|length > 0 %}
+                    Tente ajustar os filtros de busca ou
+                    <a href="{{ url_for('appointments.index') }}" class="text-primary hover:text-secondary">
+                        visualize todos os agendamentos
+                    </a>.
+                    {% else %}
+                    Comece criando um
+                    <a href="{{ url_for('appointments.new') }}" class="text-primary hover:text-secondary">
+                        novo agendamento
+                    </a>.
                     {% endif %}
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div class="flex justify-end space-x-3">
-                            <a href="{{ url_for('appointments.edit', id=appointment.id) }}" class="text-indigo-600 hover:text-indigo-900" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form method="post" action="{{ url_for('appointments.delete', id=appointment.id) }}" class="inline" onsubmit="return confirm('Tem certeza que deseja excluir este agendamento?');">
-                                <button type="submit" class="text-red-600 hover:text-red-900" title="Excluir">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                        Nenhum agendamento encontrado.
-                        <a href="{{ url_for('appointments.new') }}" class="text-primary hover:text-secondary">Criar novo agendamento</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </p>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 
+{% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const toggleFilters = document.getElementById('toggle-filters');
         const filtersContainer = document.getElementById('filters-container');
+        const filterIcon = document.getElementById('filter-icon');
         
         // Mostrar filtros se algum estiver ativo
         {% if request.args|length > 0 %}
         filtersContainer.classList.remove('hidden');
+        filterIcon.classList.remove('fa-chevron-down');
+        filterIcon.classList.add('fa-chevron-up');
         {% endif %}
         
         toggleFilters.addEventListener('click', function() {
             filtersContainer.classList.toggle('hidden');
+            filterIcon.classList.toggle('fa-chevron-down');
+            filterIcon.classList.toggle('fa-chevron-up');
         });
     });
 </script>
+{% endblock %}
 {% endblock %} 
